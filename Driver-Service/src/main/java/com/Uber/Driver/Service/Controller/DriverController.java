@@ -29,9 +29,10 @@ public class DriverController {
 
     @GetMapping("/drivers/available")
     public List<DriverDTO> getAvailableDrivers() {
-        // Fetching drivers with the status ONLINE
+
         List<Driver> availableDrivers = driverRepository.findByStatus(Driver.DriverStatus.ONLINE);
 
+        System.out.println(availableDrivers);
         availableDrivers.forEach(driver -> {
             System.out.println("Driver ID: " + driver.getId() +
                     ", Latitude: " + driver.getLatitude() +
