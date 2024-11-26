@@ -26,7 +26,7 @@ public class Ride {
     @Column(name = "pickup_longitude", nullable = false)
     private Double pickupLongitude;
 
-    // Separate columns for dropoff location (latitude and longitude)
+
     @Column(name = "dropoff_latitude", nullable = false)
     private Double dropoffLatitude;
 

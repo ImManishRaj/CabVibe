@@ -1,0 +1,29 @@
+#version: '3.8'
+#
+#services:
+#  zookeeper:
+#    image: confluentinc/cp-zookeeper:latest
+#    container_name: zookeeper
+#    ports:
+#      - "2181:2181"
+#    environment:
+#      ZOOKEEPER_CLIENT_PORT: 2181
+#      ZOOKEEPER_TICK_TIME: 2000
+#      ZOOKEEPER_SYNC_LIMIT: 2  # Optional, you can add it to tune performance
+#
+#  kafka:
+#    image: confluentinc/cp-kafka:latest
+#    container_name: kafka
+#    ports:
+#      - "9092:9092"  # External port for communication with outside
+#      - "9093:9093"  # Internal port for communication within Docker network
+#    environment:
+#      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+#      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT  # Protocol mapping
+#      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9093,OUTSIDE://localhost:9092  # External and internal listeners
+#      KAFKA_LISTENERS: INSIDE://0.0.0.0:9093,OUTSIDE://0.0.0.0:9092  # Listeners inside and outside the Docker network
+#      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE  # Internal listener for broker communication
+#    depends_on:
+#      - zookeeper
+#    expose:
+#      - "9093"  # Expose internal port to Kafka producers/consumers in Docker network

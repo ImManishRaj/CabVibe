@@ -16,6 +16,6 @@ public class DriverDTO {
     private String vehicleDetails;
     private DriverStatus status;
     private Double rating;
-    private Double latitude;  // Added latitude
-    private Double longitude; // Added longitude
+    private Double latitude;
+    private Double longitude;
 }

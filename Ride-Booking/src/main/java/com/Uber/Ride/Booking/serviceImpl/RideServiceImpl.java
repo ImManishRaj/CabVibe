@@ -26,12 +26,14 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final UserClient userClient;
     private final DriverClient driverClient;
+    private final WeatherServiceConsumer weatherServiceConsumer;
 
     @Autowired
-    public RideServiceImpl(RideRepository rideRepository, UserClient userClient, DriverClient driverClient) {
+    public RideServiceImpl(RideRepository rideRepository, UserClient userClient, DriverClient driverClient, WeatherServiceConsumer weatherServiceConsumer) {
         this.rideRepository = rideRepository;
         this.userClient = userClient;
         this.driverClient = driverClient;
+        this.weatherServiceConsumer = weatherServiceConsumer;
     }
 
     @Override
@@ -39,17 +41,20 @@ public class RideServiceImpl implements RideService {
                                 double dropoffLatitude, double dropoffLongitude) {
         logger.info("Booking ride for user: {}", userId);
 
+        // Fetch user information
         UserDTO userDTO = userClient.getUserById(userId);
         if (userDTO == null) {
             throw new RuntimeException("User not found with id: " + userId);
         }
         logger.info("Fetched User: {}", userDTO);
 
+        // Fetch available drivers
         List<DriverDTO> availableDrivers = getAvailableDrivers();
         if (availableDrivers.isEmpty()) {
             throw new RuntimeException("No available drivers at the moment.");
         }
 
+        // Find the nearest driver
         DriverDTO nearestDriver = availableDrivers.stream()
                 .filter(driver -> driver.getLatitude() != null && driver.getLongitude() != null)
                 .min(Comparator.comparingDouble(driver -> calculateDistance(pickupLatitude, pickupLongitude,
@@ -58,6 +63,7 @@ public class RideServiceImpl implements RideService {
 
         logger.info("Nearest driver: {}", nearestDriver.getName());
 
+        // Create the new ride
         Ride ride = new Ride();
         ride.setUserId(userDTO.getId());
         ride.setDriverId(nearestDriver.getId());
@@ -68,14 +74,30 @@ public class RideServiceImpl implements RideService {
         ride.setStatus(RideStatus.PENDING);
         ride.setRideType(RideType.INSTANT);
 
+        // Calculate initial fare
         double fare = calculateFare(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
-        ride.setFare(fare);
+        logger.info("Initial fare calculated: {}", fare);
 
+        // Check for bad weather and apply surge pricing if necessary
+        boolean isBadWeather = weatherServiceConsumer.isBadWeatherForUser(String.valueOf(userId));
+        if (isBadWeather) {
+            fare = applySurgePricing(fare);
+            logger.info("Fare adjusted for user {} due to bad weather. New fare: {}", userId, fare);
+        }
+
+        ride.setFare(fare);
         logger.info("Ride to be saved: {}", ride);
         Ride savedRide = rideRepository.save(ride);
         logger.info("Ride booked successfully with ID: {}", savedRide.getId());
 
         return savedRide;
+    }
+
+    private double applySurgePricing(double fare) {
+        // Surge pricing multiplier for bad weather (e.g., 1.5x for rain, wind, etc.)
+        double surgeMultiplier = 1.5;
+        logger.info("Surge pricing applied: Fare multiplied by {}", surgeMultiplier);
+        return fare * surgeMultiplier;
     }
 
     @Override
@@ -102,12 +124,9 @@ public class RideServiceImpl implements RideService {
 
     private double calculateFare(double pickupLat, double pickupLon, double dropoffLat, double dropoffLon) {
         double distance = calculateDistance(pickupLat, pickupLon, dropoffLat, dropoffLon);
-
         double baseFare = 2.5;  // base fare in USD
         double farePerKm = 1.2;  // fare per kilometer
-        double surgeMultiplier = 1.0;  // surge multiplier (for simplicity, no surge pricing here)
-
-        return baseFare + (distance * farePerKm) * surgeMultiplier;
+        return baseFare + (distance * farePerKm);
     }
 
     private double calculateDistance(double lat1, double lon1, double lat2, double lon2) {

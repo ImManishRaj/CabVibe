@@ -19,7 +19,6 @@ public class RideDTO {
     private UserDTO userDTO;
     private DriverDTO driverDTO;
 
-    // Constructor to initialize from Ride entity and associated DTOs
     public RideDTO(Ride ride, UserDTO userDTO, DriverDTO driverDTO) {
         this.rideId = ride.getId();
         this.pickupLatitude = ride.getPickupLatitude();

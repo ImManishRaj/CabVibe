@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: gateway-service  # Application name for Spring Cloud Gateway
+
+  cloud:
+    gateway:
+      routes:
+        # Static route for user-service running on localhost (port 8080)
+        - id: user-service
+          uri: http://localhost:8080  # Static URL for user-service running on 8080
+          predicates:
+            - Path=/user/**  # Match all requests with "/user/**"
+
+        # Route for ride-booking service via Eureka (service discovery)
+        - id: ride-booking
+          uri: lb://ride-booking  # Load balancer URI for service discovery (Eureka)
+          predicates:
+            - Path=/api/ride/**
+
+        # Route for driver-service via Eureka (service discovery)
+        - id: driver-service
+          uri: lb://driver-service  # Load balancer URI for service discovery (Eureka)
+          predicates:
+            - Path=/driver/**
+
+  # Eureka Client Configuration (Enable service discovery)
+  discovery:
+    enabled: true
+    eureka:
+      client:
+        service-url:
+          defaultZone: http://localhost:8761/eureka/  # Eureka server URL
+
+  # Optional: Enable logging for Spring Cloud Gateway
+  logging:
+    level:
+      org.springframework.cloud.gateway: DEBUG  # Enable debug logging for Spring Cloud Gateway
+
+  # Optional: Enable Kafka configuration (if needed by Gateway)
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: gateway-consumer-group
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+
+# Management Endpoints Configuration (optional)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'  # Expose all management endpoints
+  security:
+    enabled: false  # Disable security for management endpoints (use carefully in production)
+
+server:
+  port: 8089  # Set the Gateway service to run on port 8089
+
+main:
+  web-application-type: reactive  # Enable reactive web application type (required for Spring Cloud Gateway)
