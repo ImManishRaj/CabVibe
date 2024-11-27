@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="edbf2890-96c2-412c-9f17-a0a1e0225130" name="Changes" comment="Spring Security has been Enabled for User Microservices">
+      <change afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/config/ExternalApiConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/config/KafkaConsumerService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/config/KafkaProducerService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/dto/WeatherData.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/service/MapperService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ride-Booking/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Ride-Booking/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/config/KafkaConsumerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/config/KafkaProducerConfig.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/controller/WeatherController.java" beforeDir="false" afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/controller/WeatherController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/dto/RideDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/dto/RideDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/model/Ride.java" beforeDir="false" afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/model/Ride.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/serviceImpl/RideServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/serviceImpl/RideServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/serviceImpl/WeatherService.java" beforeDir="false" afterPath="$PROJECT_DIR$/Ride-Booking/src/main/java/com/Uber/Ride/Booking/serviceImpl/WeatherService.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dockerfile" />
+        <option value="Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 5
+}</component>
+  <component name="ProjectId" id="2p7ju0ZW3surSI1nTDdSP79qDlX" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.DriverServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.RideBookingApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.ServiceDiscoveryApplication.executor&quot;: &quot;Run&quot;,
+    &quot;Application.UserServiceApplication.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;development&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/VIRAT/Downloads/Test For Spring Security/Test-For-Spring-Security&quot;
+  }
+}</component>
+  <component name="RunManager" selected="Application.UserServiceApplication">
+    <configuration name="DriverServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.Uber.Driver.Service.DriverServiceApplication" />
+      <module name="Driver-Service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.Uber.Driver.Service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RideBookingApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.Uber.Ride.Booking.RideBookingApplication" />
+      <module name="Ride-Booking" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.Uber.Ride.Booking.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ServiceDiscoveryApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.manish.Service.Discovery.ServiceDiscoveryApplication" />
+      <module name="Service-Discovery" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.manish.Service.Discovery.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="UserServiceApplication" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="com.Uber.User.Service.UserServiceApplication" />
+      <module name="User-Service" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="com.Uber.User.Service.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.RideBookingApplication" />
+        <item itemvalue="Application.DriverServiceApplication" />
+        <item itemvalue="Application.UserServiceApplication" />
+        <item itemvalue="Application.ServiceDiscoveryApplication" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="edbf2890-96c2-412c-9f17-a0a1e0225130" name="Changes" comment="" />
+      <created>1732124227229</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1732124227229</updated>
+    </task>
+    <task id="LOCAL-00001" summary="Spring Security has been Enabled for User Microservices">
+      <option name="closed" value="true" />
+      <created>1732625951535</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1732625951536</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Spring Security has been Enabled for User Microservices">
+      <option name="closed" value="true" />
+      <created>1732626009475</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1732626009476</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Spring Security has been Enabled for User Microservices" />
+    <option name="LAST_COMMIT_MESSAGE" value="Spring Security has been Enabled for User Microservices" />
+  </component>
+</project>

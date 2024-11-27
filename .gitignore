@@ -1,4 +1,5 @@
 # Default ignored files
 /shelf/
 /workspace.xml
-application.properties
+# Ignore all application.properties files in all microservices
+**/src/main/resources/application.properties

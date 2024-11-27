@@ -2,19 +2,27 @@ package com.Uber.Ride.Booking.serviceImpl;
 
 import com.Uber.Ride.Booking.Feign.DriverClient;
 import com.Uber.Ride.Booking.Feign.UserClient;
+import com.Uber.Ride.Booking.config.KafkaConsumerService;
+import com.Uber.Ride.Booking.config.KafkaProducerService;
 import com.Uber.Ride.Booking.dto.DriverDTO;
 import com.Uber.Ride.Booking.dto.UserDTO;
+import com.Uber.Ride.Booking.dto.WeatherData;
 import com.Uber.Ride.Booking.model.Ride;
 import com.Uber.Ride.Booking.model.RideStatus;
 import com.Uber.Ride.Booking.model.RideType;
 import com.Uber.Ride.Booking.repo.RideRepository;
 import com.Uber.Ride.Booking.service.RideService;
+import com.Uber.Ride.Booking.service.WeatherService;
+import com.netflix.discovery.converters.Auto;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -26,14 +34,20 @@ public class RideServiceImpl implements RideService {
     private final RideRepository rideRepository;
     private final UserClient userClient;
     private final DriverClient driverClient;
-    private final WeatherServiceConsumer weatherServiceConsumer;
+    private final KafkaConsumerService kafkaConsumerService;
+    private final KafkaProducerService kafkaProducerService;
 
     @Autowired
-    public RideServiceImpl(RideRepository rideRepository, UserClient userClient, DriverClient driverClient, WeatherServiceConsumer weatherServiceConsumer) {
+    private WeatherService weatherService;
+
+    @Autowired
+    public RideServiceImpl(RideRepository rideRepository, UserClient userClient, DriverClient driverClient,
+                           KafkaConsumerService kafkaConsumerService,KafkaProducerService kafkaProducerService) {
         this.rideRepository = rideRepository;
         this.userClient = userClient;
         this.driverClient = driverClient;
-        this.weatherServiceConsumer = weatherServiceConsumer;
+        this.kafkaConsumerService = kafkaConsumerService;
+        this.kafkaProducerService=kafkaProducerService;
     }
 
     @Override
@@ -46,7 +60,7 @@ public class RideServiceImpl implements RideService {
         if (userDTO == null) {
             throw new RuntimeException("User not found with id: " + userId);
         }
-        logger.info("Fetched User: {}", userDTO);
+      /*  logger.info("Fetched User: {}", userDTO);*/
 
         // Fetch available drivers
         List<DriverDTO> availableDrivers = getAvailableDrivers();
@@ -63,6 +77,13 @@ public class RideServiceImpl implements RideService {
 
         logger.info("Nearest driver: {}", nearestDriver.getName());
 
+
+        kafkaProducerService.sendDataToKafka(weatherService.getWeatherData(pickupLatitude,pickupLongitude,userId),userId);
+
+        LocalDateTime localDateTime=LocalDateTime.now();
+        DateTimeFormatter formatter=DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedTime=localDateTime.format(formatter);
+
         // Create the new ride
         Ride ride = new Ride();
         ride.setUserId(userDTO.getId());
@@ -71,6 +92,7 @@ public class RideServiceImpl implements RideService {
         ride.setPickupLongitude(pickupLongitude);
         ride.setDropoffLatitude(dropoffLatitude);
         ride.setDropoffLongitude(dropoffLongitude);
+        ride.setScheduledTime(LocalDateTime.parse(formattedTime));
         ride.setStatus(RideStatus.PENDING);
         ride.setRideType(RideType.INSTANT);
 
@@ -78,13 +100,17 @@ public class RideServiceImpl implements RideService {
         double fare = calculateFare(pickupLatitude, pickupLongitude, dropoffLatitude, dropoffLongitude);
         logger.info("Initial fare calculated: {}", fare);
 
-        // Check for bad weather and apply surge pricing if necessary
-        boolean isBadWeather = weatherServiceConsumer.isBadWeatherForUser(String.valueOf(userId));
-        if (isBadWeather) {
-            fare = applySurgePricing(fare);
-            logger.info("Fare adjusted for user {} due to bad weather. New fare: {}", userId, fare);
-        }
 
+        WeatherData weatherData = kafkaConsumerService.getWeatherDataForUser(userId);
+        logger.info("Weather Data: {}", weatherData);
+
+        boolean checkWeather = kafkaConsumerService.isBadWeather(userId);
+        logger.info("Is Bad Weather: {}", checkWeather);
+
+        if (checkWeather) {
+            logger.info("Surge Pricing Applied");
+            fare = applySurgePricing(fare);
+        }
         ride.setFare(fare);
         logger.info("Ride to be saved: {}", ride);
         Ride savedRide = rideRepository.save(ride);
@@ -94,7 +120,6 @@ public class RideServiceImpl implements RideService {
     }
 
     private double applySurgePricing(double fare) {
-        // Surge pricing multiplier for bad weather (e.g., 1.5x for rain, wind, etc.)
         double surgeMultiplier = 1.5;
         logger.info("Surge pricing applied: Fare multiplied by {}", surgeMultiplier);
         return fare * surgeMultiplier;
@@ -124,8 +149,8 @@ public class RideServiceImpl implements RideService {
 
     private double calculateFare(double pickupLat, double pickupLon, double dropoffLat, double dropoffLon) {
         double distance = calculateDistance(pickupLat, pickupLon, dropoffLat, dropoffLon);
-        double baseFare = 2.5;  // base fare in USD
-        double farePerKm = 1.2;  // fare per kilometer
+        double baseFare = 30;
+        double farePerKm = 13;  // fare per kilometer
         return baseFare + (distance * farePerKm);
     }
 

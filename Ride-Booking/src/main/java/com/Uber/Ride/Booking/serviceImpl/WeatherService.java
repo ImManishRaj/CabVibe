@@ -1,71 +1,54 @@
-package com.Uber.Ride.Booking.serviceImpl;
+package com.Uber.Ride.Booking.service;
 
-import com.Uber.Ride.Booking.model.RideRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.Uber.Ride.Booking.Feign.UserClient;
+import com.Uber.Ride.Booking.config.KafkaProducerService;
+import com.Uber.Ride.Booking.dto.WeatherData;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.micrometer.observation.Observation;
+import io.micrometer.observation.ObservationRegistry;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class WeatherService {
-
-    private static final Logger logger = LoggerFactory.getLogger(WeatherService.class);
-    private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(10);
 
     @Value("${weather.api.key}")
     private String apiKey;
 
-    private final KafkaTemplate<String, String> kafkaTemplate;
-    private final WebClient webClient;
+   @Value("${weather.service.url}")
+   private String BASE_URL;
 
-    public WeatherService(WebClient.Builder webClientBuilder, KafkaTemplate<String, String> kafkaTemplate) {
-        String BASE_URL = "http://api.weatherapi.com/v1/current.json";
-        this.webClient = webClientBuilder.baseUrl(BASE_URL).build();
-        this.kafkaTemplate = kafkaTemplate;
-    }
 
-    public Mono<Void> fetchWeatherData(RideRequest rideRequest) {
-        if (rideRequest == null ||
-                rideRequest.getPickupLatitude() == 0 ||
-                rideRequest.getPickupLongitude() == 0 ||
-                rideRequest.getUserId() == null) {
-            logger.error("Invalid ride request: Null coordinates or user ID");
-            return Mono.error(new IllegalArgumentException("Invalid ride request details"));
-        }
+   @Autowired
+   private KafkaProducerService kafkaProducerService;
 
-        String latitude = String.valueOf(rideRequest.getPickupLatitude());
-        String longitude = String.valueOf(rideRequest.getPickupLongitude());
 
-        logger.info("Fetching weather data for coordinates: {}, {}", latitude, longitude);
+    private final WebClient webClient;  // Marked as final so Lombok generates the constructor
 
-        return webClient.get()
-                .uri(uriBuilder -> uriBuilder
-                        .queryParam("key", apiKey)
-                        .queryParam("q", latitude + "," + longitude)
-                        .queryParam("aqi", "no")
-                        .build())
+    public WeatherData getWeatherData(double latitude, double longitude,Long userId) {
+        String additionalUrl = String.format("?key=%s&q=%s,%s&aqi=no", apiKey, latitude, longitude);
+
+        WeatherData weatherData = webClient.get()
+                .uri(BASE_URL + additionalUrl)
                 .retrieve()
-                .bodyToMono(String.class)
-                .timeout(REQUEST_TIMEOUT)
-                .publishOn(Schedulers.boundedElastic())
-                .flatMap(data -> {
-                    logger.info("Weather Data: {}", data);
+                .bodyToMono(WeatherData.class)
+                .block();  // This is blocking the thread
 
-                    // Send the weather data to Kafka
-                    return Mono.fromFuture(() -> kafkaTemplate.send("weather-data", rideRequest.getUserId().toString(), data))
-                            .doOnTerminate(() -> logger.info("Kafka send operation complete for User: {}", rideRequest.getUserId()))
-                            .then(); // Convert to Mono<Void>
-                })
-                .doOnError(error -> logger.error("Weather data processing failed: {}", error.getMessage(), error))
-                .onErrorResume(error -> {
-                    logger.error("Unhandled error in weather data processing", error);
-                    return Mono.empty(); // Continue gracefully even if there's an error
-                });
+        log.info("Weather Data : {}",weatherData);
+        kafkaProducerService.sendDataToKafka(weatherData,userId);
+        log.info("Data has been send to kafka");
+        return weatherData;
+
     }
 }

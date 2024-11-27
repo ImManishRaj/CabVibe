@@ -40,7 +40,7 @@ public class Ride {
     @Column(name = "fare")
     private Double fare;
 
-    @Column(name = "scheduled_time")
+    @Column(name = "booking_time")
     private LocalDateTime scheduledTime;
 
     @Enumerated(EnumType.STRING)

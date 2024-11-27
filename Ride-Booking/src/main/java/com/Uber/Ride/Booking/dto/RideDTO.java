@@ -4,6 +4,8 @@ import com.Uber.Ride.Booking.model.Ride;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 public class RideDTO {
@@ -16,6 +18,7 @@ public class RideDTO {
     private String status;
     private String rideType;
     private Double fare;
+    private LocalDateTime bookingTime;
     private UserDTO userDTO;
     private DriverDTO driverDTO;
 
@@ -24,10 +27,11 @@ public class RideDTO {
         this.pickupLatitude = ride.getPickupLatitude();
         this.pickupLongitude = ride.getPickupLongitude();
         this.dropoffLatitude = ride.getDropoffLatitude();
-        this.dropoffLongitude = ride.getDropoffLongitude(); // Corrected the assignment here
+        this.dropoffLongitude = ride.getDropoffLongitude();
         this.status = ride.getStatus().name();
         this.rideType = ride.getRideType().name();
         this.fare = ride.getFare();
+        this.bookingTime=ride.getScheduledTime();
         this.userDTO = userDTO;
         this.driverDTO = driverDTO;
     }
